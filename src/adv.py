@@ -1,3 +1,5 @@
+from player import Player
+from item import Item
 from room import Room
 
 # Declare all the rooms
@@ -49,3 +51,69 @@ room['treasure'].s_to = room['narrow']
 # Print an error message if the movement isn't allowed.
 #
 # If the user enters "q", quit the game.
+
+player = Player(input("Please enter your name:"), room['outside'])
+
+fullDirection = {
+    "n": "North",
+    "e": "East",
+    "s": "South",
+    "w": "West",
+}
+
+
+def nextRoom(dir, currentRoom):
+    direction = dir + "_to"
+    return getattr(currentRoom, direction)
+
+
+def movePlayer(ply, dir):
+    room = nextRoom(dir, ply.currentRoom)
+    if room:
+        ply.currentRoom = room
+        print(
+            f"Moved {fullDirection[dir]} and are in a new Room!")
+        return True
+    else:
+        return False
+
+
+finished = False
+helpOptions = "Options: \n  n, e, s, w: the possible directions\n  get/take ITEMNAME: picks up an item\n  drop ITEMNAME: drops the item\n  i: lists your items in your inventory\n  q: quits the game\n  h: gives you Help options"
+print(f"Lets Begin {player.name}\n{helpOptions}")
+
+
+while not finished:
+    print(player.currentRoom)
+    commands = input(
+        "Pick a Direction or pick up and drop an item: ").lower().split(" ")
+    if commands[0] in ["n", "e", "s", "w"]:
+        if movePlayer(player, commands[0]):
+            continue
+        else:
+            print("No Room in that Direction")
+            continue
+    elif commands[0] in ["take", "get"]:
+        whichItem = player.pickupItem(commands[1])
+        # print(whichItem)
+        if not whichItem:
+            print(
+                f"Item {commands[1]} is not in this room")
+            continue
+    elif commands[0] == "drop":
+        item = player.dropItem(commands[1])
+        if not item:
+            print(f"You don't have a {commands[1]}")
+            continue
+    elif commands[0] in ["i", "inventory"]:
+        print(player.inventoryString())
+        continue
+    elif commands[0] == "q":
+        finished = True
+        continue
+    elif commands[0] == "h":
+        print(helpOptions)
+        continue
+    else:
+        print("This command doesn't exist")
+        continue
