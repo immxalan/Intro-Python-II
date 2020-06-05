@@ -6,10 +6,10 @@ from room import Room
 
 room = {
     'outside':  Room("Outside Cave Entrance",
-                     "North of you, the cave mount beckons"),
+                     "North of you, the cave mount beckons", [Item("Torch", "source of light")]),
 
     'foyer':    Room("Foyer", """Dim light filters in from the south. Dusty
-passages run north and east."""),
+passages run north and east.""", [Item("Sword", "rusty blade")]),
 
     'overlook': Room("Grand Overlook", """A steep cliff appears before you, falling
 into the darkness. Ahead to the north, a light flickers in
@@ -20,7 +20,7 @@ to north. The smell of gold permeates the air."""),
 
     'treasure': Room("Treasure Chamber", """You've found the long-lost treasure
 chamber! Sadly, it has already been completely emptied by
-earlier adventurers. The only exit is to the south."""),
+earlier adventurers. The only exit is to the south.""", [Item("Leather Pouch", "empty bag")]),
 }
 
 
@@ -52,7 +52,7 @@ room['treasure'].s_to = room['narrow']
 #
 # If the user enters "q", quit the game.
 
-player = Player(input("Please enter your name:"), room['outside'])
+player = Player(input("Please enter your name: "), room['outside'])
 
 fullDirection = {
     "n": "North",
@@ -61,22 +61,24 @@ fullDirection = {
     "w": "West",
 }
 
-
+#nextRoom function - returns the linked location from the room dictionary based on player's current room + direction input
 def nextRoom(dir, currentRoom):
     direction = dir + "_to"
     return getattr(currentRoom, direction)
+# def currentLoc(current):
+#     return current
 
-
+#movePlayer function - takes the returned value from nextRoom and prints it out to player
 def movePlayer(ply, dir):
     room = nextRoom(dir, ply.currentRoom)
+    # currentRoom = currentLoc(ply.currentRoom)
     if room:
         ply.currentRoom = room
         print(
-            f"Moved {fullDirection[dir]} and are in a new Room!")
+            f"You moved {fullDirection[dir]}!")
         return True
     else:
         return False
-
 
 finished = False
 helpOptions = "Options: \n  n, e, s, w: the possible directions\n  get/take ITEMNAME: picks up an item\n  drop ITEMNAME: drops the item\n  i: lists your items in your inventory\n  q: quits the game\n  h: gives you Help options"
@@ -86,7 +88,7 @@ print(f"Lets Begin {player.name}\n{helpOptions}")
 while not finished:
     print(player.currentRoom)
     commands = input(
-        "Pick a Direction or pick up and drop an item: ").lower().split(" ")
+        "Pick a direction to go in: ").lower().split(" ")
     if commands[0] in ["n", "e", "s", "w"]:
         if movePlayer(player, commands[0]):
             continue
